@@ -3,8 +3,13 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 const port = 3000;
 const { v4: uuidv4 } = require('uuid');
+const cors = require("cors"); // Import cors
 
-const db = new sqlite3.Database('./funding-sources.db');
+
+app.use(cors());
+app.use(express.json()); // Middleware to parse JSON bodies
+
+const db = new sqlite3.Database(':memory:');
 
 db.serialize(() => {
   // FundingSources are investments that people can use to fund their long-term care expenses
