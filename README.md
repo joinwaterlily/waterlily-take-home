@@ -8,3 +8,5 @@ Take home assignment from SWE candidates
 ## Build steps
 `npm run dev`
 `npm run serv`
+
+Simple test
