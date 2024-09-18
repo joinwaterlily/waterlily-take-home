@@ -80,6 +80,47 @@ app.get("/funding-sources", (req, res) => {
 
 // TODO step 2 - Add new endpoints for adding, editing, deleting funding sources
 
+app.delete("/funding-sources/", (req, res) => {
+  const id = req.body.id;
+  const deleteStmt = db.prepare("DELETE FROM FundingSources WHERE id = ?");
+
+  deleteStmt.run(id, function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (this.changes === 0) {
+      res.status(404).json({ error: "Funding source not found" });
+      return;
+    }
+    res.status(200).json({ message: "Funding source deleted" });
+  });
+
+  deleteStmt.finalize();
+});
+
+app.post("/funding-sources", (req, res) => {
+  const fundingSource = req.body;
+
+  const insertStmt = db.prepare(
+    "INSERT INTO FundingSources VALUES (?, ?, ?, ?, ?, ?, ?)"
+  );
+
+  insertStmt.run(
+    uuidv4(),
+    fundingSource.type,
+    fundingSource.name,
+    fundingSource.cost,
+    fundingSource.projectedLtcPayout,
+    fundingSource.projectedTotalPayout,
+    fundingSource.projectedROI
+  );
+
+  insertStmt.finalize();
+
+  res.status(201).json(fundingSource);
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

@@ -1,40 +1,23 @@
 import { useState, useEffect } from "react";
-
-export interface FundingSources {
-  id: string;
-  type: string;
-  name: string;
-  cost: number;
-  projectedLtcPayout: number;
-  projectedTotalPayout: number;
-  projectedROI: number;
-}
-
-let localCache: FundingSources[] = [];
+import { FundingSource } from "./types";
 
 export function useFundingSources() {
-  const [fundingSources, setFundingSources] = useState<FundingSources[]>([]);
+  const [fundingSources, setFundingSources] = useState<FundingSource[]>([]);
   const [status, setStatus] = useState("unloaded");
 
   useEffect(() => {
-    console.log(!!localCache);
-    if (localCache.length) {
-      setFundingSources(localCache);
-    } else {
-      requestFundingSources();
-    }
+    requestFundingSources();
 
     async function requestFundingSources() {
       setFundingSources([]);
       setStatus("loading");
 
       const res = await fetch("http://localhost:3000/funding-sources");
-      const json: FundingSources[] = await res.json();
-
-      localCache = json || [];
-      setFundingSources(localCache);
+      const json: FundingSource[] = await res.json();
+      setFundingSources(json);
       setStatus("loaded");
     }
   }, []);
-  return [fundingSources, status] as const;
+
+  return [fundingSources, setFundingSources, status] as const;
 }
